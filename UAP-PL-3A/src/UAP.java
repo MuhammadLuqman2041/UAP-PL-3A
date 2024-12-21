@@ -60,3 +60,97 @@ public class UAP extends JFrame {
 
         gbc.gridx = 0; gbc.gridy = 4;
         inputPanel.add(editButton, gbc);
+
+        // Tabel Riwayat
+        String[] columnNames = {"Angka", "Hasil"};
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        JTable table = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(table);
+
+        // Komponen dalam Frame
+        frame.add(inputPanel, BorderLayout.NORTH); // Panel input di sebelah kiri
+        frame.add(scrollPane, BorderLayout.CENTER); // Tabel di tengah
+
+        // Fungsi Tombol Cek
+        cekButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String inputText = inputField.getText();
+
+                if (inputText.isEmpty()) {
+                    JOptionPane.showMessageDialog(frame, "Input tidak boleh kosong!", "Error", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    try {
+                        double angka = Double.parseDouble(inputText);
+                        String hasil;
+
+                        // Bulatkan angka ke bilangan bulat terdekat
+                        long angkaBulat = Math.round(angka);
+
+                        // Tentukan genap atau ganjil berdasarkan pembulatan
+                        hasil = (angkaBulat % 2 == 0) ? "Genap (Dibulatkan)" : "Ganjil (Dibulatkan)";
+
+                        // Tambah ke Tabel
+                        tableModel.addRow(new Object[]{angka, hasil});
+
+                        // Kosongkan input
+                        inputField.setText("");
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(frame, "Input harus berupa angka!", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
+
+        // Fungsi Tombol Hapus
+        hapusButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = table.getSelectedRow();
+                if (selectedRow != -1) {
+                    tableModel.removeRow(selectedRow);
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Pilih data yang ingin dihapus!", "Peringatan", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        });
+
+        // Fungsi Tombol Edit
+        editButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = table.getSelectedRow();
+                if (selectedRow != -1) {
+                    String angkaLama = tableModel.getValueAt(selectedRow, 0).toString();
+
+                    // Dialog input untuk angka baru
+                    String angkaBaru = JOptionPane.showInputDialog(frame, "Masukkan angka baru:", angkaLama);
+
+                    if (angkaBaru != null && !angkaBaru.isEmpty()) {
+                        try {
+                            double angka = Double.parseDouble(angkaBaru);
+                            String hasilBaru;
+
+                            // Bulatkan angka ke bilangan bulat terdekat
+                            long angkaBulat = Math.round(angka);
+
+                            // Tentukan genap atau ganjil berdasarkan pembulatan
+                            hasilBaru = (angkaBulat % 2 == 0) ? "Genap (Dibulatkan)" : "Ganjil (Dibulatkan)";
+
+                            // Perbarui tabel
+                            tableModel.setValueAt(angkaBaru, selectedRow, 0);
+                            tableModel.setValueAt(hasilBaru, selectedRow, 1);
+
+                        } catch (NumberFormatException ex) {
+                            JOptionPane.showMessageDialog(frame, "Input harus berupa angka!", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Pilih data yang ingin diedit!", "Peringatan", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        });
+
+        frame.setVisible(true);
+    }
+}
